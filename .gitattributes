@@ -1,0 +1,4 @@
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.xz filter=lfs diff=lfs merge=lfs -text
+*.bin filter=lfs diff=lfs merge=lfs -text
+clnxsomdemo_fwupd_01.12.00.00 filter=lfs diff=lfs merge=lfs -text
