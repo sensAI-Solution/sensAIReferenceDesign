@@ -1,0 +1,165 @@
+/******************************************************************************
+ * Copyright (c) 2025 Lattice Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: UNLICENSED
+ *
+ ******************************************************************************/
+
+/**
+ * This code is no longer used for camera confoguration since GARD FW is 
+ * handling it. It is being kept here for reference.
+ */
+
+/* User space application to configure the LSC219 camera on LSCC SOM */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
+#include <time.h>
+
+/* The LSC219 camera ID should read 0x0219 */
+#define LSC219_CHIP_ID_HIGH 0x02
+#define LSC219_CHIP_ID_LOW  0x19
+
+/**
+ * Each camera configuration command is sent out as a series of I2C
+ * transactions which are 3 or 4 bytes in length, with 4 being the maximum.
+ */
+#define CAM_CFG_MAX_LEN     (4)
+
+struct i2c_sendout {
+	char length;
+	char data[CAM_CFG_MAX_LEN];
+};
+
+/* This config is for IMX219 1920x1080, 2lanes obtained via kernel trace */
+struct i2c_sendout cam_config_1920x1080[] = {
+	{3, {0x01, 0x00, 0x00, 0x00}}, {3, {0x30, 0xeb, 0x05, 0x00}},
+	{3, {0x30, 0xeb, 0x0c, 0x00}}, {3, {0x30, 0x0a, 0xff, 0x00}},
+	{3, {0x30, 0x0b, 0xff, 0x00}}, {3, {0x30, 0xeb, 0x05, 0x00}},
+	{3, {0x30, 0xeb, 0x09, 0x00}}, {3, {0x45, 0x5e, 0x00, 0x00}},
+	{3, {0x47, 0x1e, 0x4b, 0x00}}, {3, {0x47, 0x67, 0x0f, 0x00}},
+	{3, {0x47, 0x50, 0x14, 0x00}}, {3, {0x45, 0x40, 0x00, 0x00}},
+	{3, {0x47, 0xb4, 0x14, 0x00}}, {3, {0x47, 0x13, 0x30, 0x00}},
+	{3, {0x47, 0x8b, 0x10, 0x00}}, {3, {0x47, 0x8f, 0x10, 0x00}},
+	{3, {0x47, 0x93, 0x10, 0x00}}, {3, {0x47, 0x97, 0x0e, 0x00}},
+	{3, {0x47, 0x9b, 0x0e, 0x00}}, {4, {0x01, 0x62, 0x0d, 0x78}},
+	{3, {0x01, 0x70, 0x01, 0x00}}, {3, {0x01, 0x71, 0x01, 0x00}},
+	{3, {0x01, 0x28, 0x00, 0x00}}, {4, {0x01, 0x2a, 0x18, 0x00}},
+	{3, {0x03, 0x01, 0x05, 0x00}}, {3, {0x03, 0x03, 0x01, 0x00}},
+	{3, {0x03, 0x04, 0x03, 0x00}}, {3, {0x03, 0x05, 0x03, 0x00}},
+	{4, {0x03, 0x06, 0x00, 0x39}}, {3, {0x03, 0x0b, 0x01, 0x00}},
+	{4, {0x03, 0x0c, 0x00, 0x72}}, {3, {0x01, 0x14, 0x01, 0x00}},
+	{4, {0x01, 0x64, 0x02, 0xa8}}, {4, {0x01, 0x66, 0x0a, 0x27}},
+	{4, {0x01, 0x68, 0x02, 0xb4}}, {4, {0x01, 0x6a, 0x06, 0xeb}},
+	{3, {0x01, 0x74, 0x00, 0x00}}, {3, {0x01, 0x75, 0x00, 0x00}},
+	{4, {0x01, 0x6c, 0x07, 0x80}}, {4, {0x01, 0x6e, 0x04, 0x38}},
+	{4, {0x06, 0x24, 0x07, 0x80}}, {4, {0x06, 0x26, 0x04, 0x38}},
+	{4, {0x01, 0x8c, 0x0a, 0x0a}}, {3, {0x03, 0x09, 0x0a, 0x00}},
+	{4, {0x01, 0x60, 0x06, 0xe3}}, {4, {0x00, 0x5a, 0x00, 0x34}},
+	{3, {0x01, 0x57, 0x00, 0x00}}, {4, {0x01, 0x58, 0x01, 0x00}},
+	{3, {0x01, 0x72, 0x03, 0x00}}, {3, {0x01, 0x72, 0x03, 0x00}},
+	{4, {0x06, 0x00, 0x00, 0x00}}, {4, {0x06, 0x02, 0x03, 0xff}},
+	{4, {0x06, 0x04, 0x03, 0xff}}, {4, {0x06, 0x06, 0x03, 0xff}},
+	{3, {0x01, 0x00, 0x01, 0x00}}, {4, {0x01, 0x5a, 0x04, 0xe5}},
+	{4, {0x00, 0x5a, 0x04, 0x77}}, {3, {0x01, 0x57, 0x55, 0x00}},
+	{4, {0x01, 0x5a, 0x04, 0xb3}}, {4, {0x01, 0x5a, 0x04, 0xa0}},
+	{4, {0x01, 0x5a, 0x04, 0x61}}, {4, {0x01, 0x5a, 0x04, 0x65}},
+	{4, {0x01, 0x5a, 0x04, 0x6f}}, {4, {0x01, 0x5a, 0x04, 0x63}},
+	{4, {0x01, 0x5a, 0x04, 0x6e}}, {4, {0x01, 0x5a, 0x04, 0x70}},
+};
+
+int main(int argc, char *argv[])
+{
+	int                 fd, i, cam_slave_addr;
+	ssize_t             nwrite;
+	char                i2c_bus[]    = "/dev/i2c-xx";
+	char                err_str[100] = {0};
+	uint8_t             buf[2]       = {0};
+
+	struct i2c_sendout *p_commands   = cam_config_1920x1080;
+
+	int                 num_transactions =
+		sizeof(cam_config_1920x1080) / sizeof(cam_config_1920x1080[0]);
+
+	if (argc < 2) {
+		printf("*** LSC219 Camera Configurator ***\n");
+		printf("Usage: %s <i2c_bus> <cam_slave_addr>\n", argv[0]);
+		printf("Example: For cam on /dev/i2c-10 with address 0x10, use: %s 10 "
+			   "0x10\n",
+			   argv[0]);
+		printf("Camera slave addr is fixed at 0x10\n");
+		return -1;
+	}
+
+	/* Open the adapter and set the address of the I2C device */
+	sprintf(i2c_bus, "/dev/i2c-%s", argv[1]);
+	fd = open(i2c_bus, O_RDWR);
+	if (fd < 0) {
+		sprintf(err_str, "%s:", i2c_bus);
+		perror(err_str);
+		return -1;
+	}
+
+	cam_slave_addr = (int)strtol(argv[2], NULL, 0);
+	/**
+      * Set the address of the I2C slave device
+      * Using I2C_SLAVE_FORCE,some times during
+      * testing observed i2c bus and resource busy
+      * while using ioctl IOCTL_SLAVE.
+      */
+	if (ioctl(fd, I2C_SLAVE_FORCE, cam_slave_addr) == -1) {
+		perror("IOCTL I2C_SLAVE_FORCE");
+		return -1;
+	}
+
+	/* Check for camera ID - read 2 bytes from location 0x00 */
+	if (write(fd, buf, 2) != 2) {
+		perror("Write CHIP_ID");
+		return -1;
+	}
+
+	usleep(1000); /* 1 ms delay */
+
+	if (read(fd, buf, 2) != 2) {
+		perror("Read CHIP_ID");
+		return -1;
+	}
+
+	if ((buf[0] != LSC219_CHIP_ID_HIGH) || (buf[1] != LSC219_CHIP_ID_LOW)) {
+		printf("Camera ID read: %02x %02x\n", buf[0], buf[1]);
+		printf("Camera ID mismatch. Expected 0x%x%x\n", LSC219_CHIP_ID_HIGH,
+			   LSC219_CHIP_ID_LOW);
+		return -1;
+	}
+	printf("Camera ID read: %02x%02x\n", buf[0], buf[1]);
+
+	/* Configure the camera */
+	for (i = 0; i < num_transactions; i++) {
+		int to_write = p_commands[i].length;
+		nwrite       = write(fd, p_commands[i].data, to_write);
+
+		/* 1 ms delay b/w writes */
+		usleep(1000);
+
+		if (nwrite != to_write) {
+			sprintf(err_str,
+					"Error at transaction[%d]: to_write=%d, wrote=%ld\n", i,
+					to_write, nwrite);
+			perror(err_str);
+			return -1;
+		}
+	}
+
+	close(fd);
+
+	printf("LSC219 on %s @ 0x%x configured successfully, %d transactions\n",
+		   i2c_bus, cam_slave_addr, num_transactions);
+
+	return 0;
+}

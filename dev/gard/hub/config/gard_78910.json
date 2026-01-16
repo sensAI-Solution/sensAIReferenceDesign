@@ -1,0 +1,9 @@
+{
+  "gard_json_version": "1.0",
+  "gard_id": 78901,
+  "gard_name": "Person Detection",
+  "hram_start_addr": "0x80000000",
+  "hram_size": "0x800000",
+  "control_bus": "HUB_GARD_BUS_I2C",
+  "data_bus": "HUB_GARD_BUS_I2C"
+}

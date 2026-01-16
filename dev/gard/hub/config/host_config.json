@@ -1,0 +1,20 @@
+{
+    "busses": [
+        {
+            "bus_type": "HUB_GARD_BUS_I2C",
+            "bus_num": 1,
+            "device_num": 81,
+            "i2c_speed": 100000
+        },
+        {
+            "bus_type": "HUB_GARD_BUS_UART",
+            "bus_dev": "/dev/ttyAMA2",
+            "uart_baudrate": 921600
+        },
+        {
+            "bus_type": "HUB_GARD_BUS_USB",
+            "usb_vendor_id": "0x1134",
+            "usb_product_id": "0xaa01"
+        }
+    ]
+}

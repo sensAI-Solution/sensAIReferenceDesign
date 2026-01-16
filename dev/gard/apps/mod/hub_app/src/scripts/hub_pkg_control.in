@@ -1,0 +1,7 @@
+Package: HUB_PKG_NAME
+Version: HUB_VERSION_STRING
+Architecture: HUB_CPU_ARCH
+Maintainer: Lattice Edge AI team
+Description: Host Accelerated Unified Bridge (H.U.B.)
+ HUB is really awesome - you should try some!
+ 

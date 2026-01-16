@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lscc-hub"
+version = ""
+authors = [
+    { name="Sampada Petkar", email="sampada.petkar@latticesemi.com" },
+    { name="Deepak Nayak", email="deepak.nayak@latticesemi.com" },
+]
+description = "A Python package for HUB devices."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Linux",
+]
+
+[project.urls]
+Homepage = "https://github.com/LSCC-Architecture/HUB"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+
+[tool.setuptools.dynamic]

@@ -1,0 +1,9 @@
+[submodule "src/hub/external/libusb"]
+	path = src/hub/external/libusb
+	url = https://github.com/LSCC-Architecture/libusb
+[submodule "src/hub/external/cJSON"]
+	path = src/hub/external/cJSON
+	url = https://github.com/LSCC-Architecture/cJSON
+[submodule "src/hub/external/libgpiod"]
+	path = src/hub/external/libgpiod
+	url = https://github.com/LSCC-Architecture/libgpiod

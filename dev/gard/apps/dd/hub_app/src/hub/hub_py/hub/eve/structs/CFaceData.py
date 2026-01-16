@@ -1,0 +1,39 @@
+import ctypes
+from .ctypes_enum import CtypesEnum
+from .CBasicStructs import *
+
+EVE_EYE_LANDMARK_SIZE = 14
+EVE_PUPIL_LANDMARK_SIZE = 2
+
+class EveEyeLandmark(CtypesEnum):
+	EVE_EYE_RIGHT_CORNER_TEMPORAL = 0
+	EVE_EYE_RIGHT_EYELID_UPPER_1 = 1
+	EVE_EYE_RIGHT_EYELID_UPPER_2 = 2
+	EVE_EYE_RIGHT_CORNER_NASAL = 3
+	EVE_EYE_RIGHT_EYELID_LOWER_1 = 4
+	EVE_EYE_RIGHT_EYELID_LOWER_2 = 5
+	EVE_EYE_LEFT_CORNER_NASAL = 6
+	EVE_EYE_LEFT_EYELID_UPPER_2 = 7
+	EVE_EYE_LEFT_EYELID_UPPER_1 = 8
+	EVE_EYE_LEFT_CORNER_TEMPORAL = 9
+	EVE_EYE_LEFT_EYELID_LOWER_2 = 10
+	EVE_EYE_LEFT_EYELID_LOWER_1 = 11
+	EVE_EYE_RIGHT_PUPIL_CENTER = 12
+	EVE_EYE_LEFT_PUPIL_CENTER = 13
+	EVE_EYE_LANDMARK_SIZE = 14
+
+class EvePupilLandmark(CtypesEnum):
+	EVE_RIGHT_PUPIL_CENTER = 0
+	EVE_LEFT_PUPIL_CENTER = 1
+	EVE_PUPIL_LANDMARK_SIZE = 2
+
+class CEyeLandmarks(ctypes.Structure):
+	_fields_ = [
+		("landmarks", CPoint3f * EVE_EYE_LANDMARK_SIZE),
+	]
+
+class CPupilLandmarks(ctypes.Structure):
+	_fields_ = [
+		("landmarks", CPoint3f * EVE_PUPIL_LANDMARK_SIZE),
+	]
+

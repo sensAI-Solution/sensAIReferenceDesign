@@ -1,0 +1,82 @@
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+# ARM specific?
+*.axf
+*.elf
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+
+# Bin files
+*.bin
+
+# cscope, tags, output related
+cscope.*
+tags
+build/*
+!build/Makefile
+!build/Makefile.vars
+!build/README.md
+
+# vim swap files
+.*.swp
+
+
+# Leave alone README.md files in all the folders.
+!**/README.md
+
+# Leave out any changes to src/hub/external
+src/hub/external/*
+
+# Ignore files created by HUB Python library
+**/venv/**
+**/__pycache__/**
+**/*.egg-info/**
+**/.vscode/**

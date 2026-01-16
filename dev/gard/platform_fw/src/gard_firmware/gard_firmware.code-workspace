@@ -1,0 +1,224 @@
+{
+	"folders": [
+		{
+			"name": "src",
+			"path": "../../src"
+		},
+		{
+			"name": "build",
+			"path": "../../build"
+		},
+		{
+			"name": "release",
+			"path": "../../release"
+		}
+	],
+	"settings": {
+		"[markdown]": {
+			"files.trimTrailingWhitespace": false
+		},
+		"files.exclude": {
+			"**/hub": true,
+		},
+		"makefile.makefilePath": "${workspaceFolder}/../build/Makefile",
+		"makefile.configurations": [
+			{
+				"name": "Debug",
+				"makeArgs": [
+					"BUILD_TYPE=debug",
+					"-j"
+				]
+			},
+			{
+				"name": "Release",
+				"makeArgs": [
+					"BUILD_TYPE=release",
+					"-j"
+				]
+			},
+			{
+				"name": "Default",
+				"makeArgs": [
+					"BUILD_TYPE=debug",
+					"-j"
+				]
+			}
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "start-openocd",
+				"type": "shell",
+				"command": "C:/lscc/propel/2025.1/sdk/openocd/bin/openocd.exe",
+				"args": [
+					"-c gdb_port 3333",
+					"-c telnet_port 4444",
+					"-c tcl_port 6666",
+					"-c set target 0",
+					"-c set tck 5",
+					"-c set port FTUSB-0",
+					"-c set channel 14",
+					"-c set cmdlength 0",
+					"-c set loc 0",
+					"-f", "C:/lscc/propel/2025.1/sdk/openocd/share/openocd/scripts/interface/lattice-cable.cfg",
+					"-c", "set RISCV_SMALL_YAML {${workspaceFolder:src}/../tools/cpu.yaml}",
+					"-f", "C:/lscc/propel/2025.1/sdk/openocd/share/openocd/scripts/target/riscv-small.cfg"
+				],
+				"options": {
+					"cwd": "C:/lscc/propel/2025.1/sdk/openocd"
+				},
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Attach FirmWare to RISC-V OPEN OCD Server",
+				"type": "cppdbg",
+				"request": "launch",
+				"preLaunchTask": "start-openocd",
+				"program": "${workspaceFolder:build}/output/gard_firmware/fw/gard_fw.elf",
+				"stopAtConnect": true,
+				"cwd": "${workspaceFolder:src}",
+				"externalConsole": false,
+				"MIMode": "gdb",
+				"miDebuggerPath": "C:/lscc/propel/2025.1/sdk/riscv-none-embed-gcc/bin/riscv-none-embed-gdb.exe",
+				"miDebuggerServerAddress": "localhost:3333",
+				"setupCommands": [
+					{
+						"description": "Set architecture",
+						"text": "set arch riscv:rv32",
+						"ignoreFailures": true
+					},
+					{
+						"description": "Make all memory accessible",
+						"text": "set mem inaccessible-by-default off",
+						"ignoreFailures": true
+					},
+					{
+						"description": "Disable hardware watchpoints",
+						"text": "set can-use-hw-watchpoints 0",
+						"ignoreFailures": true
+					},
+					{
+						"description": "Set remote timeout",
+						"text": "set remotetimeout 60",
+						"ignoreFailures": true
+					},
+					{
+						"description": "Set output radix to hexadecimal",
+						"text": "set output-radix 16",
+						"ignoreFailures": false
+					}
+				],
+				"logging": {
+					"engineLogging": false,
+					"programOutput": true,
+					"exceptions": false,
+					"trace": false,
+					"traceResponse": false
+				}
+			},
+			{
+				"name": "Attach FirmWare Loader to RISC-V OPEN OCD Server",
+				"type": "cppdbg",
+				"request": "launch",
+				"preLaunchTask": "start-openocd",
+				"program": "${workspaceFolder:build}/output/gard_firmware/fw_ldr/gard_fw_ldr.elf",
+				"stopAtConnect": true,
+				"cwd": "${workspaceFolder:src}",
+				"externalConsole": false,
+				"MIMode": "gdb",
+				"miDebuggerPath": "C:/lscc/propel/2025.1/sdk/riscv-none-embed-gcc/bin/riscv-none-embed-gdb.exe",
+				"miDebuggerServerAddress": "localhost:3333",
+				"setupCommands": [
+					{
+						"description": "Set architecture",
+						"text": "set arch riscv:rv32",
+						"ignoreFailures": true
+					},
+					{
+						"description": "Make all memory accessible",
+						"text": "set mem inaccessible-by-default off",
+						"ignoreFailures": true
+					},
+					{
+						"description": "Disable hardware watchpoints",
+						"text": "set can-use-hw-watchpoints 0",
+						"ignoreFailures": true
+					},
+					{
+						"description": "Set remote timeout",
+						"text": "set remotetimeout 60",
+						"ignoreFailures": true
+					},
+					{
+						"description": "Set output radix to hexadecimal",
+						"text": "set output-radix 16",
+						"ignoreFailures": false
+					}
+				],
+				"logging": {
+					"engineLogging": false,
+					"programOutput": true,
+					"exceptions": false,
+					"trace": false,
+					"traceResponse": false
+				}
+			},
+			{
+				"name": "Python Debug: UART Writer",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"cwd": "${fileDirname}",
+				"args": [
+					"-m",
+					"0x500",
+					"-f",
+					"ML3-FW.bin",
+					"-s",
+					"-t",
+					"-u",
+					"/dev/ttyUSB0",
+				]
+			},
+			{
+				"name": "Python Debug: Image Builder",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"cwd": "${fileDirname}",
+				"args": [
+					"-y",
+					"RFS-Config-For-MOD.yaml"
+
+				]
+			},
+			{
+				"name": "Python Debug: Camera Config Builder",
+				"type": "debugpy",
+				"request": "launch",
+				"program": "${file}",
+				"console": "integratedTerminal",
+				"cwd": "${fileDirname}",
+				"args": [
+					"-o",
+					"Camera01Config.bin",
+					"--camconfcmnd",
+					"0x1015=Camera02Config.bin",
+					"--camconfcmnd",
+					"Start Stream=Camera02Config.bin",
+					"--basicconf",
+					"LayoutVersion=1,DriverVersion=2.321.121,VendorName=Sony,ModelNo=IMX-219,Interfaces=i2c,Interfaces=mipi"
+				]
+			}
+		],
+		"compounds": []
+	}
+}

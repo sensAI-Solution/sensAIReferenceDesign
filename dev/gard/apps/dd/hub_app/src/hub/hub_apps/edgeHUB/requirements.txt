@@ -1,0 +1,15 @@
+# Python dependencies for edgeHUB Flask application
+# Install with: pip install -r requirements.txt
+
+blinker==1.9.0
+click==8.3.0
+cryptography==45.0.7
+Flask==3.1.2
+itsdangerous==2.2.0
+Jinja2==3.1.6
+linuxpy==0.23.0
+MarkupSafe==3.0.3
+numpy==1.25.2
+opencv-python==4.11.0.86
+typing_extensions==4.15.0
+Werkzeug==3.1.3

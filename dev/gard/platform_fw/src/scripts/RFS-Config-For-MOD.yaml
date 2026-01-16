@@ -1,0 +1,62 @@
+# OutFile lists the filename which will contain the generated image.
+Output File: "fwroot-MOD.bin"
+
+# Set Force to true if the script should overwrite the output file if the output
+# file is already present.
+# Currently this flag is ignored by the script.
+Overwrite Existing Config File: true
+
+# If Merge With Existing Config is false then the script will make a new output
+# file based on the current settings. If true then the script will 'merge' the
+# new settings with the existing settings in the same config file.
+# Currently this option is not supported by the script.
+Merge With Existing Config: false
+
+# List all the ML networks that are to be placed in the generated image. These
+# images may/may not get used by the firmware. Ensure each firmware image is
+# assigned to a different unique UID which start from 0x2001 and the last valid
+# ML Network UID is 0x2FFF
+ML Networks:
+  "0x2001": "mod_model.bin"
+
+# List all the firmware files that are to be placed in the generated image.
+# Ensure each firmware image is assigned to a different unique UID which start
+# from 0x1001 and the last valid Firmware UID is 0x1FFF
+Gard Firmwares:
+  "0x1001": "../../build/output/gard_firmware/fw/gard_fw.bin"
+
+# List the camera configuration files for each connected camera. If all the
+# connected cameras are of the same vendor/model then only one camera config
+# file is needed. Ensure each camera config file is assigned to a different
+# unique UID which start from 0x3001 and the last valid Camera Config UID is
+# 0x3FFF
+Camera Configurations:
+  "0x3001": "Sony-IMX219-4K-Camera-Configuration.bin"
+
+# List all the App Data files that are to be placed in the generated image.
+# Ensure each firmware image is assigned to a different unique UID which start
+# from 0x5001 and the last valid firmware UID is 0x5FFF
+# The App Data bin files size should be aligned to 4 bytes.
+App Data:
+  "0x5001": "app_data.bin"
+
+# Various configuration parameters for the RFS image are listed below. These
+# parameters describe the RFS Layout, similar to the superblock in a filesystem.
+# Please do not change these parameters unless you know what you are doing.
+RFS Config:
+  Layout Version: 1
+  Update Count: 4
+  Control Field: "Config-valid"
+  Control Field: "crc-not-valid"
+  Start Of Directory: "0x10000"
+  UID Of Firmware To Boot: "0x1001"
+
+# Since this image is written to a flash device, the following parameter defines
+# the minimum block/sector size that can be erased in a single operation. This
+# value is used to align the modules within the RFS image to support easy
+# upgrades.
+Flash Erase Block Alignment: "0x8000"
+
+# The number of copies of the RFS directory to be maintained within the image.
+# This is useful in case of corruption of one of the copies.
+RFS Dir Copies: 1

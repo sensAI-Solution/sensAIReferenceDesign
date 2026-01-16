@@ -1,0 +1,17 @@
+{
+  "gard_json_version": "1.0",
+  "gard_id": 12345,
+  "gard_name": "Object Detection",
+  "hram_start_addr": "0x80000000",
+  "hram_size": "0x800000",
+  "gpio_chip": "gpiochip0",
+  "gpio_inputs": {
+    "PIN25": 25
+  },
+  "gpio_outputs": {
+    "PIN37": 37,
+    "PIN40": 40
+  },
+  "control_bus": "HUB_GARD_BUS_I2C",
+  "data_bus": "HUB_GARD_BUS_I2C"
+}

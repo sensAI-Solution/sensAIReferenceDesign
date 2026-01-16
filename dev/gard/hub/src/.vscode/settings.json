@@ -1,0 +1,27 @@
+{
+    "editor.tabSize": 4,
+    "editor.insertSpaces": false,
+    "editor.detectIndentation": true,
+    "editor.rulers": [
+        {
+            "column": 80,
+            "color": "#FF00003F"
+        },
+        {
+            "column": 120,
+            "color": "#FF00007F"
+        },
+        {
+            "column": 160,
+            "color": "#FF0000FF"
+        }
+    ],
+
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.eol": "\n",
+
+    "C_Cpp.clang_format_fallbackStyle": "LLVM",
+    "C_Cpp.formatting": "clangFormat",
+    "C_Cpp.clang_format_style": "file:${workspaceFolder}/.clang-format"
+}

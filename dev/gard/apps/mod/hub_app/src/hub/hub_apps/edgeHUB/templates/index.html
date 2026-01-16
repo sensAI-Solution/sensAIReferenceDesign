@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lattice H.U.B. + GARD Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='plotly.js') }}"></script>
+    <link rel="stylesheet" href="/static/fontawesome/css/all.css">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="/static/Logo.png" alt="Lattice Semiconductor Logo" class="logo-img">
+            </div>
+            <nav class="main-tabs">
+                <button class="tab-btn active" data-tab="sensor-dashboard">Sensor Dashboard</button>
+                <button class="tab-btn" data-tab="live-streaming">Live Streaming</button>
+                <button class="tab-btn" data-tab="image-ops">Image Ops</button>
+            </nav>
+
+            <div class="main-header-title">EdgeHUB - A GARD-HUB Application</div>
+            <div style="display: flex; align-items: center; gap: 15px; margin-left: auto;">
+                <button id="circuit-view-btn" class="circuit-view-btn" title="View Circuit Diagram"
+                    style="background:transparent;border:none;font-size:1.8rem;color:#ffc107;cursor:pointer;padding:8px 12px;border-radius:8px;transition:all 0.3s ease;">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button id="exit-btn" title="Exit Dashboard"
+                    style="background:transparent;border:none;font-size:1.8rem;color:#dc3545;cursor:pointer;padding:8px 12px;border-radius:8px;transition:all 0.3s ease;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <main id="main-content" class="main-content">
+            <section id="tab-content">
+                <div class="tab-panel" id="sensor-dashboard-panel">
+                    <div class="sensor-graphs-grid">
+                        <div class="graph-box">
+                            <div class="graph-title">Temperature (°C)</div>
+                            <div class="graph-plot" id="plot-temp"></div>
+                        </div>
+                        <div class="graph-box">
+                            <div class="graph-title">Voltage (V)</div>
+                            <div class="graph-plot" id="plot-voltage"></div>
+                        </div>
+                        <div class="graph-box">
+                            <div class="graph-title">Current (A)</div>
+                            <div class="graph-plot" id="plot-current"></div>
+                        </div>
+                        <div class="graph-box">
+                            <div class="graph-title">Power (W)</div>
+                            <div class="graph-plot" id="plot-power"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="tab-panel" id="person-detection-panel" style="display:none;">
+                    <div class="tab-placeholder">Person Detection content coming soon...</div>
+                </div> -->
+                <div class="tab-panel" id="live-streaming-panel">
+                    <div class="live-streaming-content">
+                        <!-- Camera Sub-Tabs -->
+                        <div class="camera-sub-tabs">
+                            <button class="camera-sub-tab-btn active" data-camera="cpnx">
+                                <i class="fas fa-camera"></i> CPNX Camera (Pi)
+                            </button>
+                            <button class="camera-sub-tab-btn" data-camera="clnx">
+                                <i class="fas fa-video"></i> CLNX Camera (USB)
+                            </button>
+                            <button class="camera-sub-tab-btn" data-camera="dual">
+                                <i class="fas fa-camera-retro"></i> Dual Camera
+                            </button>                            
+                            <label class="checkbox" for="metadata-checkbox" id="metadata-checkbox-box" class="hidden">
+                              <input id="metadata-checkbox" type="checkbox" class="checkbox__input" checked />
+                              <span class="checkbox__box" aria-hidden="true"></span>
+                              <span class="checkbox__label">Display AI Metadata</span>
+                            </label>
+
+                        </div>
+
+                        <!-- CPNX Camera Panel -->
+                        <div class="camera-panel active" id="cpnx-camera-panel">
+                            <div class="video-header">
+                                <span class="video-title" id="cpnx-camera-title">MIPI Passthrough CPNX Pi Camera Feed</span>
+                                <div class="video-controls">
+                                    <button class="start-stream-btn stream-btn" data-camera="cpnx">
+                                        <i class="fas fa-play"></i> Start Stream
+                                    </button>
+                                    <button class="stop-stream-btn stream-btn stop" data-camera="cpnx">
+                                        <i class="fas fa-stop"></i> Stop Stream
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="video-player-container">
+                                <img class="live-video" id="cpnx-video" src="/video_feed/cpnx" />
+                                <p class="camera-stopped-msg">
+                                    CPNX Camera is stopped. Click 'Start Stream' to view.
+                                </p>
+                                <!-- Camera Info Overlay -->
+                                <div class="camera-info-overlay" id="cpnx-info" style="display: none;">
+                                    <div class="camera-info-title">CPNX Camera</div>
+                                    <div class="camera-info-item">
+                                        <span class="camera-info-label">FPS:</span>
+                                        <span class="camera-info-value camera-info-fps" id="cpnx-fps">30</span>
+                                    </div>
+                                    <div class="camera-info-item">
+                                        <span class="camera-info-label">Resolution:</span>
+                                            <span class="camera-info-value" id="dual-cpnx-resolution">3280×2464</span>
+                                    </div>
+                                    <div class="camera-info-item">
+                                        <span class="camera-info-label">Format:</span>
+                                        <span class="camera-info-value">BGR888</span>
+                                    </div>
+                                    <div class="camera-info-item">
+                                        <span class="camera-info-label">Type:</span>
+                                        <span class="camera-info-value">MIPI Pi Camera</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CLNX Camera Panel -->
+                        <div class="camera-panel" id="clnx-camera-panel">
+                            <div class="video-header">
+                                <span class="video-title" id="clnx-camera-title">MIPI Passthrough CLNX USB Camera Feed</span>
+                                <div class="video-controls">
+                                    <button class="start-stream-btn stream-btn" data-camera="clnx">
+                                        <i class="fas fa-play"></i> Start Stream
+                                    </button>
+                                    <button class="stop-stream-btn stream-btn stop" data-camera="clnx">
+                                        <i class="fas fa-stop"></i> Stop Stream
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="video-player-container">
+                                <img class="live-video" id="clnx-video" src="/video_feed/clnx" />
+                                <p class="camera-stopped-msg">
+                                    CLNX Camera is stopped. Click 'Start Stream' to view.
+                                </p>
+                                <!-- Camera Info Overlay -->
+                                <div class="camera-info-overlay" id="clnx-info" style="display: none;">
+                                    <div class="camera-info-title">CLNX Camera</div>
+                                    <div class="camera-info-item">
+                                        <span class="camera-info-label">FPS:</span>
+                                        <span class="camera-info-value camera-info-fps" id="clnx-fps">30</span>
+                                    </div>
+                                    <div class="camera-info-item">
+                                        <span class="camera-info-label">Resolution:</span>
+                                        <span class="camera-info-value" id="clnx-resolution-info">1920×1080</span>
+                                    </div>
+                                    <div class="camera-info-item">
+                                        <span class="camera-info-label">Format:</span>
+                                        <span class="camera-info-value">YUYV</span>
+                                    </div>
+                                    <div class="camera-info-item">
+                                        <span class="camera-info-label">Type:</span>
+                                        <span class="camera-info-value">USB Camera</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dual Camera Panel -->
+                        <div class="camera-panel" id="dual-camera-panel">
+                            <div class="video-header">
+                                <span class="video-title">MIPI Passthrough Dual Camera Feed</span>
+                                <div class="video-controls">
+                                    <button class="start-stream-btn stream-btn" data-camera="dual">
+                                        <i class="fas fa-play"></i> Start Both
+                                    </button>
+                                    <button class="stop-stream-btn stream-btn stop" data-camera="dual">
+                                        <i class="fas fa-stop"></i> Stop Both
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="dual-video-container">
+                                <div class="dual-video-box">
+                                    <div class="dual-video-label">CPNX Camera</div>
+                                    <img class="live-video dual-video" id="dual-cpnx-video" src="/video_feed/cpnx" />
+                                    <p class="camera-stopped-msg">CPNX Camera stopped</p>
+                                    <!-- Camera Info Overlay -->
+                                    <div class="camera-info-overlay" id="dual-cpnx-info" style="display: none;">
+                                        <div class="camera-info-title">CPNX Camera</div>
+                                        <div class="camera-info-item">
+                                            <span class="camera-info-label">FPS:</span>
+                                            <span class="camera-info-value camera-info-fps" id="dual-cpnx-fps">10</span>
+                                        </div>
+                                        <div class="camera-info-item">
+                                            <span class="camera-info-label">Resolution:</span>
+                                            <span class="camera-info-value" id="cpnx-resolution">3280×2464</span>
+                                        </div>
+                                        <div class="camera-info-item">
+                                            <span class="camera-info-label">Format:</span>
+                                            <span class="camera-info-value">RGB888</span>
+                                        </div>
+                                        <div class="camera-info-item">
+                                            <span class="camera-info-label">Type:</span>
+                                            <span class="camera-info-value">MIPI Pi Camera</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dual-video-box">
+                                    <div class="dual-video-label">CLNX Camera</div>
+                                    <img class="live-video dual-video" id="dual-clnx-video" src="/video_feed/clnx" />
+                                    <p class="camera-stopped-msg">CLNX Camera stopped</p>
+                                    <!-- Camera Info Overlay -->
+                                    <div class="camera-info-overlay" id="dual-clnx-info" style="display: none;">
+                                        <div class="camera-info-title">CLNX</div>
+                                        <div class="camera-info-item">
+                                            <span class="camera-info-label">FPS:</span>
+                                            <span class="camera-info-value camera-info-fps" id="dual-clnx-fps">10</span>
+                                        </div>
+                                        <div class="camera-info-item">
+                                            <span class="camera-info-label">Resolution:</span>
+                                            <span class="camera-info-value" id="dual-clnx-resolution">1920×1080</span>
+                                        </div>
+                                        <div class="camera-info-item">
+                                            <span class="camera-info-label">Format:</span>
+                                            <span class="camera-info-value">YUYV</span>
+                                        </div>
+                                        <div class="camera-info-item">
+                                            <span class="camera-info-label">Type:</span>
+                                            <span class="camera-info-value">USB Camera</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-panel" id="image-ops-panel">
+                    <div class="image-ops-container">
+                        <div class="image-ops-left">
+                            <div class="image-display-area">
+                                <img id="captured-image" src="" alt="Captured Image" style="display: none; max-width: 100%; max-height: 100%; object-fit: contain;">
+                                <div id="image-placeholder" class="image-placeholder-text">
+                                    <i class="fas fa-camera" style="font-size: 4rem; margin-bottom: 20px;"></i>
+                                    <p>No image captured yet</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="image-ops-right">
+                            <div class="image-ops-controls">
+                                <h2 class="image-ops-heading">GARD-ISP captured Image Operations</h2>
+                                
+                                <div class="control-section">
+                                    <button id="capture-image-btn" class="control-action-btn">
+                                        <i class="fas fa-camera"></i> Capture Image
+                                    </button>
+                                </div>
+
+                                <div class="control-section">
+                                    <div class="metric-group">
+                                        <div class="metric-group-header">
+                                            <i class="fas fa-clipboard-list"></i>
+                                            <span>Image Classification</span>
+                                        </div>
+                                        <div class="radio-group">
+                                            <label class="radio-label">
+                                                <input type="radio" name="anomaly-status" value="normal" checked>
+                                                <span>Normal</span>
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="anomaly-status" value="anomaly">
+                                                <span>Anomaly</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="control-section">
+                                    <div class="metric-group">
+                                        <div class="metric-group-header">
+                                            <i class="fas fa-save"></i>
+                                            <span>Save Configuration</span>
+                                        </div>
+                                        <div class="radio-group save-location-group">
+                                            <label class="radio-label">
+                                                <input type="radio" name="save-location" value="client" checked>
+                                                <span>User Machine</span>
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="save-location" value="server">
+                                                <span>SOM CM5</span>
+                                            </label>
+                                        </div>
+                                        <div class="path-input-group" style="margin-top: 15px;">
+                                            <div style="display: flex; gap: 4px;">
+                                                <input type="text" id="image-save-path" class="path-input" value="" placeholder="Select or enter path...">
+                                                <button id="browse-folder-btn" class="browse-btn" title="Browse folder" style="padding: 8px 12px; background: var(--lattice-yellow); color: var(--header-bg); border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+                                                    <i class="fas fa-folder-open"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <small id="save-info-text" style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 12px; display: block; line-height: 1.4;"></small>
+                                    </div>
+                                </div>
+
+                                <div class="control-section">
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <select id="image-format-select" class="image-format-select">
+                                            <option value="png">PNG</option>
+                                            <option value="jpg">JPG</option>
+                                            <option value="bmp">BMP</option>
+                                            <option value="bin">RAW</option>
+                                        </select>
+                                        <button id="save-image-btn" class="control-action-btn save-btn" style="flex: 2;">
+                                            <i class="fas fa-save"></i> Save Image
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <div id="carousel-container" class="carousel-container">
+                <div class="carousel-wrapper">
+                    <button class="carousel-arrow carousel-arrow-left" id="prevBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-arrow carousel-arrow-right" id="nextBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="carousel-slides">
+                        <div class="carousel-slide active">
+                            <img src="/static/Edge-AI.png" alt="Edge AI Solutions">
+                            <div class="slide-content">
+                                <h2>Build Smarter, Faster Far Edge AI</h2>
+                                <p>With Lattice AI Optimized FPGA and Solutions</p>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/certusnx_machxo5.png" alt="High I/O Low Power">
+                            <div class="slide-content">
+                                <h2>High I/O, Low Power</h2>
+                                <p>New Small FPGA Devices are Now Available</p>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/lattice-insights.png" alt="FPGA Training">
+                            <div class="slide-content">
+                                <h2>Knowledge is Power</h2>
+                                <p>Unlock Yours With FPGA Trainings</p>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="/static/software.png" alt="FPGA Design Software">
+                            <div class="slide-content">
+                                <h2>Dream It, Design It</h2>
+                                <p>With Lattice FPGA Design Software</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-dots">
+                        <span class="dot active" data-slide="0"></span>
+                        <span class="dot" data-slide="1"></span>
+                        <span class="dot" data-slide="2"></span>
+                        <span class="dot" data-slide="3"></span>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div id="image-display-container" class="image-display-container">
+                <div class="image-content-box">
+                    <div class="image-display-header"
+                        style="display: flex; align-items: center; margin-bottom: 0; padding: 12px 15px; background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 193, 7, 0.08)); border-radius: 10px; border: 1px solid var(--lattice-yellow); box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);">
+                        <div
+                            style="display: flex; align-items: center; justify-content: center; width: 100%; position: relative;">
+                            <span id="image-title-text"
+                                style="font-size:1.5rem;font-weight:700;color:var(--lattice-yellow);text-shadow: 0 1px 3px rgba(0,0,0,0.3);letter-spacing: 1px; text-align: center;">CM5
+                                Camera Image</span>
+                            <button id="close-image-btn" class="close-image-btn" title="Close Image"
+                                style="background:transparent;border:none;font-size:2rem;color:#ffc107;z-index:10;cursor:pointer;position: absolute; right: 0;">
+                                <i class="fas fa-times"></i>
+                        </div>
+                        <div class="image-controls-external"
+                            style="text-align: center; padding: 20px; margin-right: -40px;">
+                            <button id="isp-settings-btn"
+                                style="background: linear-gradient(135deg, var(--lattice-yellow), #e6b800); color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);">
+                                <i class="fas fa-cog" style="font-size: 0.9rem;"></i>
+                                ISP SETTING
+                            </button>
+                        </div>
+                    </div>
+        </main>
+
+        <div id="circuit-viewer" class="circuit-viewer hidden">
+            <div class="circuit-viewer-content">
+                <button id="close-circuit-btn" class="close-circuit-btn" title="Close Circuit Viewer">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="circuit-image-container">
+                    <img src="/static/Edge_AI_Arch.svg" alt="Circuit Diagram" class="circuit-image">
+                </div>
+            </div>
+        </div>
+
+        <nav id="sidenav" class="sidenav">
+            <div class="sidenav-header">
+                <h2>Hardware Metrics</h2>
+            </div>
+            <div class="metric-group">
+                <div class="metric-group-header">
+                    <i class="fas fa-thermometer-half"></i>
+                    <span>Temperature</span>
+                </div>
+                <div class="metric-card" data-metric="temp1" data-title="North Sensor Temperature" data-unit="°C">
+                    <div class="metric-icon"><i class="fas fa-thermometer-half"></i></div>
+                    <div class="metric-info">
+                        <span class="metric-name">North Sensor Temperature</span>
+                        <h3 class="metric-value" id="temp1-value">--</h3>
+                    </div>
+                    <div class="metric-trend" id="temp1-trend"></div>
+                    <div class="metric-config" data-metric="temp1">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                </div>
+                <div class="metric-card" data-metric="temp2" data-title="South Sensor Temperature" data-unit="°C">
+                    <div class="metric-icon"><i class="fas fa-thermometer-half"></i></div>
+                    <div class="metric-info">
+                        <span class="metric-name">South Sensor Temperature</span>
+                        <h3 class="metric-value" id="temp2-value">--</h3>
+                    </div>
+                    <div class="metric-trend" id="temp2-trend"></div>
+                    <div class="metric-config" data-metric="temp2">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                </div>
+                <div class="metric-card" data-metric="temp3" data-title="CM5 Temperature" data-unit="°C">
+                    <div class="metric-icon"><i class="fas fa-thermometer-half"></i></div>
+                    <div class="metric-info">
+                        <span class="metric-name">CM5 Temperature</span>
+                        <h3 class="metric-value" id="temp3-value">--</h3>
+                    </div>
+                    <div class="metric-trend" id="temp3-trend"></div>
+                    <div class="metric-config" data-metric="temp3">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                </div>
+
+            </div>
+            <div class="metric-group">
+                <div class="metric-group-header">
+                    <i class="fas fa-bolt"></i>
+                    <span>Power</span>
+                </div>
+                <div class="metric-subgroup">
+                    <div class="metric-subgroup-header">
+                        <i class="fas fa-microchip"></i>
+                        <span>CM5 Power Sensor</span>
+                    </div>
+                    <div class="metric-card" data-metric="voltage1" data-title="CM5 Voltage" data-unit="V">
+                        <div class="metric-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-name">Voltage</span>
+                            <h3 class="metric-value" id="voltage1-value">--</h3>
+                        </div>
+                        <div class="metric-trend" id="voltage1-trend"></div>
+                        <div class="metric-config" data-metric="voltage1">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                    </div>
+                    <div class="metric-card" data-metric="current1" data-title="CM5 Current" data-unit="A">
+                        <div class="metric-icon"><i class="fas fa-plug"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-name">Current</span>
+                            <h3 class="metric-value" id="current1-value">--</h3>
+                        </div>
+                        <div class="metric-trend" id="current1-trend"></div>
+                        <div class="metric-config" data-metric="current1">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                    </div>
+                    <div class="metric-card" data-metric="power1" data-title="CM5 Power" data-unit="W">
+                        <div class="metric-icon"><i class="fas fa-battery-half"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-name">Power</span>
+                            <h3 class="metric-value" id="power1-value">--</h3>
+                        </div>
+                        <div class="metric-trend" id="power1-trend"></div>
+                        <div class="metric-config" data-metric="power1">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-subgroup">
+                    <div class="metric-subgroup-header">
+                        <i class="fas fa-microchip"></i>
+                        <span>SOM Power Sensor</span>
+                    </div>
+                    <div class="metric-card" data-metric="voltage2" data-title="SOM Voltage" data-unit="V">
+                        <div class="metric-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-name">Voltage</span>
+                            <h3 class="metric-value" id="voltage2-value">--</h3>
+                        </div>
+                        <div class="metric-trend" id="voltage2-trend"></div>
+                        <div class="metric-config" data-metric="voltage2">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                    </div>
+                    <div class="metric-card" data-metric="current2" data-title="SOM Current" data-unit="A">
+                        <div class="metric-icon"><i class="fas fa-plug"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-name">Current</span>
+                            <h3 class="metric-value" id="current2-value">--</h3>
+                        </div>
+                        <div class="metric-trend" id="current2-trend"></div>
+                        <div class="metric-config" data-metric="current2">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                    </div>
+                    <div class="metric-card" data-metric="power2" data-title="SOM Power" data-unit="W">
+                        <div class="metric-icon"><i class="fas fa-battery-half"></i></div>
+                        <div class="metric-info">
+                            <span class="metric-name">Power</span>
+                            <h3 class="metric-value" id="power2-value">--</h3>
+                        </div>
+                        <div class="metric-trend" id="power2-trend"></div>
+                        <div class="metric-config" data-metric="power2">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div id="threshold-modal" class="threshold-modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Configure Thresholds</h3>
+                <button class="modal-close" id="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="threshold-group-horizontal">
+                    <div class="threshold-input-group">
+                        <label for="safe-max">Threshold Value:</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="safe-max" step="0.1" placeholder="Enter threshold value">
+                            <span class="threshold-unit" id="safe-max-unit"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="threshold-info">
+                    <p><span class="color-indicator safe"></span> Normal: 0 to Threshold Value</p>
+                    <p><span class="color-indicator danger"></span> Danger: Above Threshold Value</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="modal-cancel">Cancel</button>
+                <button class="btn-save" id="modal-save">Save Threshold</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="isp-modal" class="threshold-modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="isp-modal-title">Lattice Hub Says</h3>
+                <button class="modal-close" id="isp-modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="isp-modal-message">
+                    <p style="text-align: center; font-size: 1.1rem; color: var(--text-primary); margin: 20px 0;">
+                        ISP Functionality coming soon!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+
+</body>
+
+</html>

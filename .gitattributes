@@ -2,3 +2,4 @@
 *.xz filter=lfs diff=lfs merge=lfs -text
 *.bin filter=lfs diff=lfs merge=lfs -text
 clnxsomdemo_fwupd_01.12.00.00 filter=lfs diff=lfs merge=lfs -text
+dev/gard/rtl/mod_top_torna_revb_cpnx100.zip filter=lfs diff=lfs merge=lfs -text

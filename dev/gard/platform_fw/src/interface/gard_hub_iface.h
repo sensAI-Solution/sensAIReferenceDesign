@@ -1,0 +1,483 @@
+/******************************************************************************
+ * Copyright (c) 2025 Lattice Semiconductor Corporation
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ ******************************************************************************/
+
+#ifndef GARD_HUB_IFACE_H
+#define GARD_HUB_IFACE_H
+
+/**
+ * Make sure the compiler search path uses the types.h in the interface folder
+ * for maximum compatibility between GARD and HUB.
+ */
+#include "types.h"
+
+/**
+ * This is the DISCOVERY CMD RESPONSE SIGNATURE for pre-version 1 which helps
+ * identify the GARD code that does not support returning
+ * FIRMWARE VERSION NUMBER command.
+ */
+#define HUB_GARD_DISCOVER_SIGNATURE_PRE_VER_1 "I AM GARD"
+
+/**
+ * This is the latest DISCOVERY CMD RESPONSE SIGNATURE for version 1.
+ */
+#define HUB_GARD_DISCOVER_SIGNATURE_VER_1     "I M GARD1"
+
+/* HUB GARD DISCOVERY CMD RESPONSE SIGNATURE */
+#define HUB_GARD_DISCOVER_SIGNATURE           HUB_GARD_DISCOVER_SIGNATURE_VER_1
+
+enum special_markers {
+	/**
+	 * The following markers are used to indicate the start and end of data
+	 * transfer over UART. These markers are used to identify the boundaries
+	 * of the data being transferred and to ensure that the data is received
+	 * correctly.
+	 */
+	END_OF_DATA_MARKER   = 0xE0DBE0DBU,
+	START_OF_DATA_MARKER = 0x50DB50DBU,
+	ACK_BYTE             = 0xAC,
+};
+
+/**
+ * The following are the command IDs that are placed in the command_id field
+ * of the host_requests structure. These IDs are used to identify
+ * the command being sent from the host to the GARD over UART.
+ * Each command ID corresponds to a specific command that the GARD can execute.
+ * The command IDs are used to determine the command body structure and the
+ * expected response structure.
+ */
+enum host_request_command_ids {
+	GARD_DISCOVERY                     = 0x0u,
+	SEND_DATA_TO_GARD_FOR_OFFSET       = 0x1u,
+	RECV_DATA_FROM_GARD_AT_OFFSET      = 0x2u,
+	READ_REG_VALUE_FROM_GARD_AT_OFFSET = 0x3u,
+	WRITE_REG_VALUE_TO_GARD_AT_OFFSET  = 0x4u,
+	GET_ML_ENGINE_STATUS               = 0x5u,
+	PAUSE_PIPELINE                     = 0x20u,
+	CAPTURE_RESCALED_IMAGE             = 0x21u,
+	RESUME_PIPELINE                    = 0x22u,
+	UPGRADE_FIRMWARE                   = 0x23u,
+	GET_FIRMWARE_VERSION               = 0x24u,
+	GET_SUPPORTED_CMNDS_LIST           = 0x25u,
+	GET_SUPPORTED_SUB_CMNDS_LIST       = 0x26u,
+};
+
+/**
+ * The following are the control codes that are used in the command body of
+ * the host_requests structure. These control codes are used to
+ * specify additional options for the command being sent to the GARD.
+ * Each control code is a bit flag that can be combined with others to specify
+ * multiple options.
+ */
+enum control_codes {
+	/**
+	 * When CC_MTU_SIZE is set, the mtu_size field in the command body
+	 * specifies the maximum size of the data transfer. If the data to be sent
+	 * exceeds this size, it will be split into multiple packets of size
+	 * mtu_size. This also implies that each packet will contain a header
+	 * containing a packet number and the CRC calculated over the data contained
+	 * within that packet.
+	 * Sender:
+	 * The sender will wait for an ACK from the receiver for the previous packet
+	 * before sending the next packet. If ACK is not received within a certain
+	 * timeout, or if a NAK is received then the sender will re-send the packet
+	 * to the receiver.
+	 * Receiver:
+	 * The receiver will validate the CRC of each packet received and
+	 * will send an ACK if the packet is received successfully. If the packet
+	 * contents fail the CRC validation then the receiver will send a NAK to the
+	 * sender to indicate that the packet needs to be re-sent. The receiver will
+	 * maintain a running count of the received packets and ensure that the next
+	 * packet received is the next in sequence. If a packet is received out of
+	 * order then the receiver will send a NAK with the expected packet number
+	 * embedded in the NAK packet.
+	 * ***** Currently this is not implemented in the GARD firmware. *****
+	 */
+	CC_USE_MTU_SIZE        = (1 << 0),
+
+	/**
+	 * An optional ACK can be sent by the receiver after the data transfer
+	 * is complete by setting the bit CC_SEND_ACK_AFTER_XFER in the control
+	 * field. This is useful for the sender to know that the receiver has
+	 * received the data successfully. This field does not make sense if
+	 * CC_USE_MTU_SIZE is set as CC_USE_MTU_SIZE setting will do a more rigorous
+	 * validation of the data transfer.
+	 */
+	CC_SEND_ACK_AFTER_XFER = (1 << 1),
+
+	/**
+	 * When CC_CHECKSUM_PRESENT is set then a single 32-bit checksum follows
+	 * the data transfer. This field is redundant if CC_USE_MTU_SIZE field is
+	 * set. */
+	CC_CHECKSUM_PRESENT    = (1 << 2),
+
+	/**
+	 * The CC_APP_DATA bit indicates that during the execution of
+	 * RECV_DATA_FROM_GARD_AT_OFFSET command, the data to be sent to the Host is
+	 * generated by the App Module and it should be read from the buffer pointed
+	 * by app_tx_buffer variable. The offset_address field in the command body
+	 * should be ignored.
+	 */
+	CC_APP_DATA            = (1 << 3),
+};
+
+/**
+ * The following enum captures all the possible image formats. The binary image
+ * data captured from the camera and sent to HUB is crafted in one of these
+ * formats.
+ */
+enum image_formats {
+	/* This is invalid and should not be used. */
+	IMAGE_FORMAT__INVALID        = 0x0u,
+
+	/**
+	 * The RGB values in the image are in non-planar fashion. In other words
+	 * each pixel is represented by 3 consecutive bytes representing R, G and B
+	 * values.
+	 */
+	IMAGE_FORMAT__RGB_NON_PLANAR = 0x1u,
+
+	/**
+	 * The RGB values in the image are in planar fashion. In other words the
+	 * first 1/3rd of the buffer is the R values, the next 1/3rd is the G values
+	 * and the last 1/3rd is the B values.
+	 */
+	IMAGE_FORMAT__RGB_PLANAR     = 0x2u,
+
+	/**
+	 * The image is a grayscale image. The image is represented by a single byte
+	 * for each pixel.
+	 */
+	IMAGE_FORMAT__GRAYSCALE      = 0x3u,
+};
+
+enum firmware_upgrade_sub_command_ids {
+	/**
+	 * Invalid comand. We mark '0' as not a valid value.
+	 */
+	USCID__INVALID_SUB_COMMAND     = 0x0u,
+
+	/**
+	 * Return information about the resources to be used within GARD during
+	 * xfer of firmware binary.
+	 */
+	USCID__GET_XFER_INFORMATION    = 0x1u,
+
+	/**
+	 * Write the firmware binary (complete or partial) within GARD from volatile
+	 * to persistent storage.
+	 */
+	USCID__WRITE_FIRMWARE_TO_FLASH = 0x2u,
+
+	/**
+	 * Check if operation is complete.
+	 */
+	USCID__IS_OPERATION_COMPLETE   = 0x3u,
+};
+
+/**
+ * Ensure these structures are not padded as they are exchanged by code running
+ * on different architectures.
+ * RISC-V firmware does not support unaligned access, so GARD firmware needs to
+ * memcpy individual fields in a locally padded structure for use.
+ */
+
+#pragma pack(1)
+
+struct _host_requests {
+	uint8_t command_id;  // Command identifier having a value from enum
+						 // host_request_command_ids
+
+	union {
+		uint8_t command_body[1];  // Point where the command body starts.
+
+		// struct send_data_to_gard_for_offset_request is to be used when
+		// command_id is SEND_DATA_TO_GARD_FOR_OFFSET.
+		struct _send_data_to_gard_for_offset_request {
+			struct {
+				uint32_t offset_address;  // Offset address in GARD memory map.
+				uint32_t data_size;       // Size of data to be sent to GARD
+				uint16_t control_code;  // Control code from enum control_codes
+				uint16_t mtu_size;      // Maximum Transmission Unit size
+			} cmd;
+
+			uint8_t data[0];  // Data to be sent to GARD
+
+			struct {
+				uint32_t end_of_data_marker;  // END OF DATA marker
+				uint32_t opt_crc;             // CRC for data integrity
+			} eod;
+		} send_data_to_gard_for_offset_request;
+
+		// struct recv_data_from_gard_at_offset_request is to be used when
+		// command_id is RECV_DATA_FROM_GARD_AT_OFFSET.
+		struct _recv_data_from_gard_at_offset_request {
+			uint32_t offset_address;  // Offset address in GARD memory map.
+			uint32_t data_size;       // Size of data to be received from GARD;
+			uint16_t
+				control_code;   // Control code as defined in enum control_codes
+			uint16_t mtu_size;  // Maximum Transmission Unit size
+		} recv_data_from_gard_at_offset_request;
+
+		// struct read_reg_value_from_gard_at_offset_request is to be used when
+		// command_id is READ_REG_VALUE_FROM_GARD_AT_OFFSET.
+		struct _read_reg_value_from_gard_at_offset_request {
+			uint32_t offset_address;      // Offset address in GARD memory map.
+			uint32_t end_of_data_marker;  // END OF DATA marker
+		} read_reg_value_from_gard_at_offset_request;
+
+		// struct write_reg_value_to_gard_at_offset_request is to be used when
+		// command_id is WRITE_REG_VALUE_TO_GARD_AT_OFFSET.
+		struct _write_reg_value_to_gard_at_offset_request {
+			uint32_t offset_address;      // Offset address in GARD memory map.
+			uint32_t data;                // 32-bit data to be written to GARD
+			uint32_t end_of_data_marker;  // END OF DATA marker
+		} write_reg_value_to_gard_at_offset_request;
+
+		// struct get_ml_engine_status_request is to be used when command_id is
+		// GET_ML_ENGINE_STATUS.
+		struct _get_ml_engine_status_request {
+			uint32_t engine_id;  // ID of the ML engine to get status for
+			uint32_t end_of_data_marker;  // END OF DATA marker
+		} get_ml_engine_status_request;
+
+		struct _gard_discovery_request {
+			uint32_t dummy[0];  // No data present in the discovery command body
+		} gard_discovery_request;
+
+		// struct capture_rescaled_image_request is to be used when
+		// command_id is CAPTURE_RESCALED_IMAGE.
+		struct _capture_rescaled_image_request {
+			uint8_t  camera_id;           // Camera to take the image.
+			uint16_t rsvd1;               // Pad bytes.
+			uint32_t end_of_data_marker;  // END OF DATA marker
+		} capture_rescaled_image_request;
+
+		// struct pause_pipeline_request is to be used when
+		// command_id is PAUSE_PIPELINE.
+		struct _pause_pipeline_request {
+			uint8_t  camera_id;           // Camera whose pipeline to pause.
+			uint16_t rsvd1;               // Pad bytes.
+			uint32_t end_of_data_marker;  // END OF DATA marker
+		} pause_pipeline_request;
+
+		// struct resume_pipeline_request is to be used when
+		// command_id is RESUME_PIPELINE.
+		struct _resume_pipeline_request {
+			uint8_t  camera_id;           // Camera whose pipeline to resume.
+			uint16_t rsvd1;               // Pad bytes.
+			uint32_t end_of_data_marker;  // END OF DATA marker
+		} resume_pipeline_request;
+
+		// struct get_firmware_version_request is to be used when
+		// command_id is GET_FIRMWARE_VERSION.
+		struct _get_firmware_version_request {
+			uint32_t dummy[0];  // No data present in the get firmware version
+								// command body
+		} get_firmware_version_request;
+
+		// struct get_supported_commands_list_request is to be used when
+		// command_id is GET_SUPPORTED_CMNDS_LIST.
+		struct _get_supported_commands_list_request {
+			uint32_t dummy[0];  // No data present in the get supported commands
+								// list command body
+		} get_supported_commands_list_request;
+
+		// struct get_supported_sub_commands_list_request is to be used when
+		// command_id is GET_SUPPORTED_SUB_CMNDS_LIST.
+		struct _get_supported_sub_commands_list_request {
+			uint32_t dummy[0];  // No data present in the get supported sub
+								// commands list command body
+		} get_supported_sub_commands_list_request;
+
+		// struct upgrade_firmware_request is to be used when
+		// command_id is UPGRADE_FIRMWARE.
+		struct _upgrade_firmware_request {
+			uint8_t sub_command_id;  // Sub-command identifier
+
+			union {
+				struct {
+					uint16_t is_bitstream_included : 1;   // Bitstream in image.
+					uint16_t rsvd1                 : 15;  // Pad bytes
+					uint32_t firmware_size;  // Size of the firmware
+					uint32_t rsvd2[2];       // Pad bytes
+				} get_xfer_information;
+
+				struct {
+					uint16_t rsvd1;           // Pad bytes
+					uint32_t buffer_address;  // Buffer address containing data
+					uint32_t bytes_to_write;  // Size of this data packet
+					uint32_t flash_address;   // Flash address to write to
+				} write_firmware_to_flash;
+
+				struct {
+					uint8_t rsvd1[14];  // Pad bytes
+				} is_operation_complete;
+			};
+		} upgrade_firmware_request;
+	};
+};
+
+struct _host_responses {
+	union {
+		// struct send_data_to_gard_for_offset_response is to be used for
+		// sending an optional ACK as response to command
+		// SEND_DATA_TO_GARD_FOR_OFFSET.
+		struct _send_data_to_gard_for_offset_response {
+			uint8_t
+				opt_ack;  // Optional ACK byte to send after command execution
+		} send_data_to_gard_for_offset_response;
+
+		// struct recv_data_from_gard_at_offset_response is to be used when
+		// command_id is RECV_DATA_FROM_GARD_AT_OFFSET.
+		struct _recv_data_from_gard_at_offset_response {
+			uint32_t start_of_data_marker;  // START OF DATA marker
+			uint32_t data_size;             // Size of data sent by GARD;
+			uint8_t  data[0];               // Data received from GARD
+
+			struct {
+				uint32_t end_of_data_marker;  // END OF DATA marker
+				uint32_t opt_crc;             // CRC for data integrity
+			} eod;
+		} recv_data_from_gard_at_offset_response;
+
+		// struct read_reg_value_from_gard_at_offset_response is to be used when
+		// command_id is READ_REG_VALUE_FROM_GARD_AT_OFFSET.
+		struct _read_reg_value_from_gard_at_offset_response {
+			uint32_t start_of_data_marker;  // START OF DATA marker
+			uint32_t
+				reg_value;  // Register value read from GARD at specified offset
+			uint32_t end_of_data_marker;  // END OF DATA marker
+		} read_reg_value_from_gard_at_offset_response;
+
+		// struct write_reg_value_to_gard_at_offset_response is to be used when
+		// command_id is WRITE_REG_VALUE_TO_GARD_AT_OFFSET.
+		struct _write_reg_value_to_gard_at_offset_response {
+			uint8_t ack;  // ACK byte to send after write completion
+		} write_reg_value_to_gard_at_offset_response;
+
+		// struct get_ml_engine_status_response is to be used when command_id is
+		// GET_ML_ENGINE_STATUS.
+		struct _get_ml_engine_status_response {
+			uint32_t start_of_data_marker;  // START OF DATA marker
+			uint32_t status_code;           // Status code of the ML engine
+			uint32_t end_of_data_marker;    // END OF DATA marker
+		} get_ml_engine_status_response;
+
+		// struct gard_discovery_response is to be used when command_id is
+		// DISCOVERY.
+		struct _gard_discovery_response {
+			uint32_t start_of_data_marker;  // START OF DATA marker
+			uint8_t  signature[10];         // Signature for discovery response
+			uint32_t end_of_data_marker;    // END OF DATA marker
+			// No data present in the discovery response body
+		} gard_discovery_response;
+
+		// struct capture_rescaled_image_response is to be used when
+		// command_id is CAPTURE_RESCALED_IMAGE.
+		struct _capture_rescaled_image_response {
+			uint32_t start_of_data_marker;  // START OF DATA marker
+			uint32_t image_buffer_address;  // Image buffer address.
+			uint32_t image_buffer_size;     // Size of the captured image.
+			uint16_t h_size;                // Horizontal size of the image.
+			uint16_t v_size;                // Vertical size of the image.
+			uint32_t image_format;  // Definition from enum image_formats
+
+			struct {
+				uint32_t end_of_data_marker;  // END OF DATA marker
+			} eod;
+		} capture_rescaled_image_response;
+
+		// struct pause_pipeline_response is to be used when
+		// command_id is PAUSE_PIPELINE.
+		struct _pause_pipeline_response {
+			uint8_t ack_or_nak;  // Pipeline pause status
+		} pause_pipeline_response;
+
+		// struct resume_pipeline_response is to be used when
+		// command_id is RESUME_PIPELINE.
+		struct _resume_pipeline_response {
+			uint8_t ack_or_nak;  // Pipeline resume status
+		} resume_pipeline_response;
+
+		// struct get_firmware_version_response is to be used when
+		// command_id is GET_FIRMWARE_VERSION.
+		struct _get_firmware_version_response {
+			uint32_t start_of_data_marker;   // START OF DATA marker
+			uint16_t major_version_number;   // FW Major version number.
+			uint16_t minor_version_number;   // FW Minor version number.
+			uint16_t bugfix_version_number;  // FW Bugfix version number.
+			uint16_t rsvd1;                  // Padding.
+
+			struct {
+				uint32_t end_of_data_marker;  // END OF DATA marker
+			} eod;
+		} get_firmware_version_response;
+
+		// struct get_supported_commands_list_response is to be used when
+		// command_id is GET_SUPPORTED_CMNDS_LIST.
+		struct _get_supported_commands_list_response {
+			uint32_t start_of_data_marker;  // START OF DATA marker
+			uint32_t num_bitmap_bytes;      // Number of bytes in the
+											// supported commands bitmap. GARD
+											// ensures that the bytes after the
+											// end of bitmap is a multiple of 4.
+			uint8_t bitmap[0];  // Bitmap array representing supported
+								// commands.
+
+			struct {
+				uint32_t end_of_data_marker;  // END OF DATA marker
+			} eod;
+		} get_supported_commands_list_response;
+
+		// struct get_supported_sub_commands_list_response is to be used when
+		// command_id is GET_SUPPORTED_SUB_CMNDS_LIST.
+		struct _get_supported_sub_commands_list_response {
+			uint32_t start_of_data_marker;  // START OF DATA marker
+			uint32_t num_bitmap_bytes;      // Number of bytes in the
+											// supported sub commands bitmap.
+											// GARD ensures that the bytes after
+											// the end of bitmap is a multiple
+											// of 4.
+			uint8_t bitmap[0];  // Bitmap array representing supported
+								// sub commands.
+
+			struct {
+				uint32_t end_of_data_marker;  // END OF DATA marker
+			} eod;
+		} get_supported_sub_commands_list_response;
+
+		// struct upgrade_firmware_response is to be used when
+		// command_id is UPGRADE_FIRMWARE.
+		struct _upgrade_firmware_response {
+			union {
+				struct {
+					uint32_t start_of_data_marker;  // START OF DATA marker
+					uint32_t buffer_address;        // Buffer address.
+					uint32_t buffer_size;           // Buffer size.
+					uint32_t flash_address;         // Flash address.
+
+					struct {
+						uint32_t end_of_data_marker;  // END OF DATA marker
+					} eod;
+				} get_xfer_information_response;
+
+				struct {
+					uint8_t ack;  // ACK
+				} write_firmware_to_flash_response;
+
+				struct {
+					uint8_t operation_status;  // 1 if complete, 0 otherwise
+				} is_operation_complete_response;
+			};
+		} upgrade_firmware_response;
+	};
+};
+
+#pragma pack()
+
+#endif  // GARD_HUB_IFACE_H
+

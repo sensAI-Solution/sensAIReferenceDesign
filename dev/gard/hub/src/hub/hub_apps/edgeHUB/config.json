@@ -1,0 +1,218 @@
+{
+    "version": 5,
+    "server": {
+        "host": "0.0.0.0",
+        "port": 5000,
+        "debug": false,
+        "threaded": true,
+        "use_reloader": false
+    },
+    "ssl": {
+        "cert_file": "server.crt",
+        "key_file": "server.key"
+    },
+    "cameras": {
+        "usb": {
+            "id": 0,
+            "width": 1920,
+            "height": 1080,
+            "type": "usb",
+            "name": "CLNX Camera",
+            "display_name": "MIPI Passthrough CLNX USB Camera Feed"
+        },
+        "pi": {
+            "id": "pi",
+            "width": 3280,
+            "height": 2464,
+            "type": "picamera2",
+            "name": "CPNX Camera",
+            "display_name": "MIPI Passthrough CPNX Pi Camera Feed"
+        }
+    },
+    "sensors": {
+        "temperature": {
+            "sensor_1_id": 1,
+            "sensor_2_id": 2
+        },
+        "energy": {
+            "sensor_1_id": 1,
+            "sensor_2_id": 2
+        },
+        "system_temp_command": ["vcgencmd", "measure_temp"]
+    },
+    "paths": {
+        "default_server_save_path": "/home/lattice/Downloads/edgeHUB/",
+        "default_client_save_path": "Downloads",
+        "save_folder_name": "edgeHUB"
+    },
+    "image_ops": {
+        "filename_prefix": "edgehub_imageops",
+        "filename_format": "edgehub_imageops_{classification}_{timestamp}.png",
+        "timestamp_format": "%Y%m%d_%H%M%S",
+        "image_format": "png",
+        "jpeg_quality": 95,
+        "png_compression": 3,
+        "default_format": "bin",
+        "valid_formats": ["png", "jpg", "jpeg", "bmp", "bin"]
+    },
+    "gard": {
+        "default_gard_num": 0,
+        "default_camera_id": 0
+    },
+    "image_format_constants": {
+        "rgb_non_planar": 0,
+        "rgb_planar": 1,
+        "default_width": 384,
+        "default_height": 288
+    },
+    "api_endpoints": {
+        "index": "/",
+        "get_live_data": "/get_live_data",
+        "video_feed": "/video_feed",
+        "video_feed_cpnx": "/video_feed/cpnx",
+        "video_feed_clnx": "/video_feed/clnx",
+        "video_feed_dual": "/video_feed/dual",
+        "camera_control": "/camera_control",
+        "camera_status": "/camera_status",
+        "capture_image": "/api/capture_image_from_gard",
+        "save_image": "/api/save_image",
+        "config": "/api/config"
+    },
+    "local_storage_keys": {
+        "client_save_path": "edgeHUB_client_save_path",
+        "server_save_path": "edgeHUB_server_save_path"
+    },
+    "messages": {
+        "info_text": "Image will be downloaded in <strong>edgeHUB</strong> folder at the given location. By default it is set to Downloads folder.<br>Filename will be auto-generated as: <code style=\"color: var(--lattice-yellow); font-size: 0.85rem;\">edgehub_imageops_&lt;classification&gt;_&lt;timestamp&gt;.png</code>",
+        "no_image_captured": "No image captured yet",
+        "folder_selected": "Folder selected. Images will be saved in edgeHUB subfolder.",
+        "image_saved_to_edgehub": "Image saved to edgeHUB/: {filename}",
+        "image_downloaded_to_downloads": "Image downloaded. Check edgeHUB folder.",
+        "server_path_manual": "For server paths, please enter the path manually. Server file system cannot be browsed from browser.",
+        "folder_picker_not_supported": "Folder picker not supported in this browser. Please enter path manually.",
+        "image_captured_success": "Image captured successfully!",
+        "image_capture_failed": "Failed to capture image",
+        "error_capturing_image": "Error capturing image",
+        "error_saving_image": "Error saving image",
+        "download_cancelled": "Download cancelled",
+        "could_not_retrieve_image": "Could not retrieve image data for download",
+        "dashboard_update_failed": "Dashboard update failed:"
+    },
+    "errors": {
+        "config_not_found": "Warning: config.json not found at {path}, using defaults",
+        "config_parse_error": "Error parsing config.json: {error}, using defaults",
+        "usb_camera_setup_failed": "USB Camera setup failed: {error}",
+        "pi_camera_setup_failed": "Pi Camera setup failed: {error}",
+        "hub_init_failed": "HUB initialization failed: {error}",
+        "force_exiting": "Force exiting...",
+        "received_signal": "Received {signal}",
+        "failed_start_usb_camera": "Failed to start USB Camera: {error}",
+        "failed_start_pi_camera": "Failed to start Pi Camera: {error}",
+        "failed_stop_usb_camera": "Failed to stop USB Camera: {error}",
+        "failed_stop_pi_camera": "Failed to stop Pi Camera: {error}",
+        "error_camera_control": "Error in camera_control: {error}",
+        "error_capture_image": "Error in capture_image endpoint: {error}",
+        "error_capture_gard_image": "Error in capture_image_from_gard endpoint: {error}",
+        "error_processing_image": "Error processing image: {error}",
+        "error_serving_image": "Error serving image: {error}",
+        "error_save_image": "Error in save_image: {error}",
+        "error_getting_gard": "Error getting GARD: {error}",
+        "failed_encode_image": "Failed to encode image to {image_format}",
+        "buffer_size_mismatch": "Buffer size {buffer_size} doesn't match expected dimensions {width}x{height} for format {image_format}",
+        "failed_decode_base64_data": "Failed to decode image from base64 data",
+        "error_loading_config": "Error loading config: {error}, using defaults",
+        "failed_load_config": "Failed to load config, using defaults",
+        "error_capturing_image_js": "Error capturing image:",
+        "error_downloading_image": "Error downloading image:",
+        "error_fetching_image": "Error fetching image from server:",
+        "error_converting_image": "Error converting image to base64:",
+        "error_accessing_folder": "Error accessing {folder} folder:",
+        "error_using_saved_handle": "Error using saved directory handle, falling back to regular download:",
+        "warning_metadata": "Warning: Could not save metadata: {error}"
+    },
+    "status": {
+        "success": "success",
+        "error": "error",
+        "running": "Running",
+        "no_camera_found": "No Camera Found",
+        "unknown": "Unknown",
+        "stopped": "Stopped"
+    },
+    "delays": {
+        "cleanup_sleep": 0.5,
+        "data_update_interval": 1000,
+        "carousel_interval": 3000,
+        "toast_show_delay": 10,
+        "toast_hide_delay": 3000,
+        "toast_remove_delay": 300
+    },
+    "http_status_codes": {
+        "ok": 200,
+        "bad_request": 400,
+        "not_found": 404,
+        "internal_server_error": 500,
+        "no_content": 204
+    },
+    "mime_types": {
+        "image_png": "image/png",
+        "image_jpeg": "image/jpeg",
+        "image_bmp": "image/bmp",
+        "application_octet_stream": "application/octet-stream",
+        "text_plain": "text/plain",
+        "multipart_mixed": "multipart/x-mixed-replace; boundary=frame"
+    },
+    "files": {
+        "config_filename": "config.json",
+        "metadata_extension": ".metadata.json"
+    },
+    "constants": {
+        "classification_normal": "normal",
+        "exit_code_force": 1,
+        "exit_code_normal": 0
+    },
+    "server_messages": {
+        "starting_app": "Starting edgeHUB application...",
+        "server_available": "Server available at: http://{host}:{port}",
+        "press_ctrl_c": "Press Ctrl+C to stop",
+        "keyboard_interrupt": "Keyboard interrupt received",
+        "error_occurred": "Error: {error}"
+    },
+    "validation": {
+        "no_image_path": "No image path provided",
+        "image_not_found": "Image not found: {path}",
+        "file_not_found": "File not found: {filename}",
+        "could_not_parse": "Could not parse image data",
+        "save_on_server_false": "save_on_server flag is False. Use client-side download instead.",
+        "absolute_path_required": "Please provide an absolute path (starting with / or ~)",
+        "cannot_create_directory": "Cannot create directory: {error}",
+        "invalid_image_data": "Invalid image data format",
+        "failed_decode_base64": "Failed to decode base64 image data: {error}. Please capture the image again.",
+        "failed_decode_save": "Failed to decode/save image: {error}",
+        "source_image_not_found": "Source image not found: {image_path}",
+        "failed_save_image": "Failed to save image: {error}",
+        "no_image_data": "No image data or path provided",
+        "image_saved_success": "Image saved successfully to {path} with status: {classification}",
+        "image_saved_to": "Image saved to {path}"
+    },
+    "plot_labels": {
+        "time": "Time",
+        "temperature": "Temperature (°C)",
+        "voltage": "Voltage (V)",
+        "current": "Current (A)",
+        "power": "Power (W)"
+    },
+    "plot_trace_names": {
+        "temp": ["North Sensor Temperature", "South Sensor Temperature", "CM5 Temperature"],
+        "voltage": ["CM5 Voltage", "SOM Voltage"],
+        "current": ["CM5 Current", "SOM Current"],
+        "power": ["CM5 Power", "SOM Power"]
+    },
+    "plot_metric_keys": {
+        "temp": ["temp1", "temp2", "temp3"],
+        "voltage": ["voltage1", "voltage2"],
+        "current": ["current1", "current2"],
+        "power": ["power1", "power2"]
+    },
+    "data_window_size": 40
+}
+
