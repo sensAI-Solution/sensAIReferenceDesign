@@ -1,8 +1,9 @@
 # sensAI Reference Designs Repository
 This repository includes reference designs for various Edge AI applications to leverage Lattice hardware such as the CLNX and CPNX platforms.
 
->[!NOTE]
->This repository uses Git LFS for artifact distribution and is not intended for active collaboration. It is not recommended to download the entire repository; instead, download individual files, archives, or use the provided download links.
+>[!WARNING]
+>This repository uses Git LFS for artifact distribution and is not intended for active collaboration. Please follow the steps in the [official Github documentation for Git LFS](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) before cloning.
+>If this step is skipped, certain binaries will not download properly, which may be difficult to diagnose in some cases.
 
 ## Human Machine Interface Demo
 The [CrossLinkU™-NX System-on-Module (SoM) HMI Demonstration Design](https://www.latticesemi.com/products/designsoftwareandip/intellectualproperty/demos/human-to-machine-interfacing-demonstration) is a demo solution for Human-Machine Interface (HMI) applications. It enables AI-driven interaction capabilities such as person detection, face recognition, and face identification, delivering intuitive and intelligent user experiences at the edge.
