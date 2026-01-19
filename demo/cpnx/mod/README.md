@@ -1,6 +1,10 @@
 # Multiple Object Detection Reference Design on CPNX
 This page is the starting point for anybody intending to setup the CPNX MOD demo.
 
+>[!WARNING]
+>This repository uses Git LFS for artifact distribution and is not intended for active collaboration. Please follow the steps in the [official Github documentation for Git LFS](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) before cloning.
+>If this step is skipped, certain binaries will not download properly, which may be difficult to diagnose in some cases.
+
 ## Introduction
 This demo shows the capabilities of a multi-object detection network by running the network on FPGA, receiving the results on a Raspberry Pi and displaying them overlayed on the live image from the camera.
 
