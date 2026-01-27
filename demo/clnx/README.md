@@ -26,7 +26,7 @@ This design is optimized for low-power embedded vision systems, leveraging Latti
 Refer to [CrossLinkU-NX SoM Demo Kit](https://www.latticesemi.com/products/developmentboardsandkits/crosslinku-nx-system-on-module-som-board) (OPN: LIFCL-SOM-EVN) for more information.
 
 ### Setup
-This HMI demo comes with a [user guide](docs/FPGA-RD-02333-1-0-CrossLinkU-NX-SoM-for-HMI-Demonstration.pdf), including details of setup, configuration information and troubleshooting methodology.
+This HMI demo comes with a [user guide](docs/FPGA-RD-02333-1-1-CrossLinkU-NX-SoM-for-HMI-Demonstration.pdf), including details of setup, configuration information and troubleshooting methodology.
 
 ## Folder Structure
 ```
