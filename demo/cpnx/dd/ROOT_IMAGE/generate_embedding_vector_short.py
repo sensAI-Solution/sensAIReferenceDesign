@@ -12,12 +12,12 @@ print(f"Generating embedding vectors by using ML-Engine Simulator {ml_engine_sim
 # To be changed by user
 # ====================
 # Input data:
-MODEL_FILE_PATH = r"C:\Users\vrodionov\Downloads\dd-model-sensai-fpga-shapes-5shots.h5"
-REF_IMAGE_PATH = r"C:\Repos\LML\GARD-Pipelines\networks\defect_detection\DD-RGB-Shots15-Vitamins.png"
+MODEL_FILE_PATH = r"C:\Users\user\Downloads\model-shapes\model-shapes\model-sensai-h5-best.h5"
+REF_IMAGE_PATH = r"C:\Users\user\Downloads\model-shapes\model-shapes\img_ref_fixed.png"
 THRESHOLD = 0.2
 
 # Output data:
-OUTPUT_DIR = r"C:\Repos\LML\GARD-Pipelines\networks\defect_detection"
+OUTPUT_DIR = r"C:\Users\user\Downloads\model-shapes\model-shapes"
 EMBEDDING_BIN_FILE = r"defect_detection_ok_vitamins_embedding_vector_64_bytes.bin"
 # ====================
 
