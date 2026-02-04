@@ -56,15 +56,16 @@ CLNXSOM_HMI_PACKAGE
 ```
 
 ## Folder Content
-| Folder                     | Content                                            | Linux Directory                 |
-| -------------------------- | -------------------------------------------------- | ------------------------------- |
-| RPI_OS                     | Raspberry Pi OS image.<sup>2</sup>                 | -                               |
-| CLNX_SPI_IMAGE             | 64 MB CrossLinkU-NX Som SPI Flash Binary.          | /opt/clnx_som/spi_flash_image   |
-| FW_UPDATE_TOOL<sup>1</sup> | CrossLinkU-NX SoM Firmware Management application. | /opt/clnx_som/FW_Update         |
-| EVE_WEBSERVER<sup>1</sup>  | EVE and Webserver installer.                       | /opt/edgeHub                    |
-| RESOURCES<sup>1</sup>      | RPi boot configuration file.                       | /opt/clnx_som/resources         |
-| RPI_SCRIPTS<sup>1</sup>    | Demo and programmer scripts.                       | /opt/clnx_som/resources/scripts |
-| RPI_DRIVERS<sup>1</sup>    | Lattice drivers and overlays for the demo.         | /opt/clnx_som/drivers           |
+| Folder                     | Content                                                                                  | Linux Directory                 |
+| -------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------- |
+| RPI_OS                     | Raspberry Pi OS image.<sup>2</sup>                                                       | -                               |
+| CLNX_SPI_IMAGE             | 64 MB CrossLinkU-NX Som SPI Flash Binary.                                                | /opt/clnx_som/spi_flash_image   |
+| FW_UPDATE_TOOL<sup>1</sup> | CrossLinkU-NX SoM Firmware Management application.                                       | /opt/clnx_som/FW_Update         |
+| EVE_WEBSERVER<sup>1</sup>  | EVE and Webserver installer.                                                             | /opt/edgeHub                    |
+| RESOURCES<sup>1</sup>      | RPi boot configuration file.                                                             | /opt/clnx_som/resources         |
+| RPI_SCRIPTS<sup>1</sup>    | Demo and programmer scripts.                                                             | /opt/clnx_som/resources/scripts |
+| RPI_DRIVERS<sup>1</sup>    | Lattice drivers and overlays for the demo.                                               | /opt/clnx_som/drivers           |
+| WFOV_GESTURE_PREVIEW       | Separate standalone demo that adds hand landmarks and allows using a WFOV lens on IMX219 | -                               |
 
 Notes:
 1. Preinstalled into the RPi OS image.
