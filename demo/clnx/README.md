@@ -26,7 +26,7 @@ This design is optimized for low-power embedded vision systems, leveraging Latti
 Refer to [CrossLinkU-NX SoM Demo Kit](https://www.latticesemi.com/products/developmentboardsandkits/crosslinku-nx-system-on-module-som-board) (OPN: LIFCL-SOM-EVN) for more information.
 
 ### Setup
-This HMI demo comes with a [user guide](docs/FPGA-RD-02333-1-1-CrossLinkU-NX-SoM-for-HMI-Demonstration.pdf), including details of setup, configuration information and troubleshooting methodology.
+This HMI demo comes with a [user guide](docs/FPGA-RD-02333-1-2-CrossLinkU-NX-SoM-for-HMI-Demonstration.pdf), including details of setup, configuration information and troubleshooting methodology.
 
 ## Folder Structure
 ```
@@ -35,7 +35,7 @@ CLNXSOM_HMI_PACKAGE
 │ └── clnxsomdemo_64MB_01_12_00_00.bin
 │
 ├── EVE_WEBSERVER
-│ └── EVEWebAppHMI_v0.1.29_CLNX.zip
+│ └── EVE_EdgeHUB_5.1_WebAppHMI_v0.1.29_CLNX.zip
 │
 ├── FW_UPDATE_TOOL
 │ └── clnxsomdemo_fwupd_01.12.00.00
@@ -52,7 +52,7 @@ CLNXSOM_HMI_PACKAGE
 │ └── lscc-imx219.ko
 │
 └── RPI_OS
-  └── RPi_OS-arm64_1.0.0_CLNX_HMI_v5.img.xz
+  └── RPi_OS-arm64_1.0.0_CLNX_HMI_v5.1.img.xz
 ```
 
 ## Folder Content
