@@ -34,4 +34,4 @@ Everything for a demonstration is ready to use after flashing the CM5 with the i
 
 
 ## Build from Reference Design
-[MOD Reference Design Instructions](docs/MOD_Reference_Design.pdf)
+[MOD Reference Design Instructions](docs/FPGA-UG-02247-1-0-CertusPro-NX-Multi-Object-Detection-on-SOM-Board-Demo-User-Guide.pdf)
