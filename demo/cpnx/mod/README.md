@@ -30,8 +30,8 @@ The following components are required to run the MOD demo on the CertusPro-NX SO
 - [rpiboot](https://github.com/raspberrypi/usbboot/raw/master/win32/rpiboot_setup.exe)
 
 ## Demo Setup
-Everything for a demonstration is ready to use after flashing the CM5 with the image in [RPI_OS](RPI_OS/) and programming the [bitstream](BITSTREAM/) at 0x00000000 as well as the [root image](ROOT_IMAGE/) at 0x00300000­. More details are available in the [MOD Demo User Guide](docs/MOD_User_Guide.pdf).
-
+Everything for a demonstration is ready to use after flashing the CM5 with the image in [RPI_OS](RPI_OS/) and programming the [bitstream](BITSTREAM/) at 0x00000000 as well as the [root image](ROOT_IMAGE/) at 0x00300000­. More details are available in the [MOD Demo User Guide](docs/FPGA-UG-02247-1-0-CertusPro-NX-Multi-Object-Detection-on-SOM-Board-Demo-User-Guide.pdf).
 
 ## Build from Reference Design
-[MOD Reference Design Instructions](docs/FPGA-UG-02247-1-0-CertusPro-NX-Multi-Object-Detection-on-SOM-Board-Demo-User-Guide.pdf)
+[MOD Reference Design Instructions](../../../dev/gard/docs/FPGA-RD-02332-1-0-sensAI-GARD-Application-Reference-Design-User-Guide.pdf
+)
